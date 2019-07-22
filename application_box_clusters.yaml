@@ -1,0 +1,147 @@
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: box-app
+  namespace: default
+  generation: 2
+  labels:
+    name: box-app
+    app: box-app
+spec:
+  componentKinds:
+    - group: apps
+      kind: Deployment
+  descriptor: {}
+  selector:
+    matchLabels:
+      app: box-app
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: Deployable
+metadata:
+  name: boxmodel
+  namespace: default
+  labels:
+    name: boxmodel
+    app: box-app
+    placementPolicy: boxmodel
+    serviceKind: ApplicationService
+spec:
+  deployer:
+    helm:
+      namespace: default
+      chartName: boxinference
+      chartURL: >-
+        https://raw.githubusercontent.com/srinivas511/inference-server-repo/master/boxinference-0.1.0.tgz
+      repository: inference-github-repo
+    kind: helm
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementPolicy
+metadata:
+  name: boxmodel
+  namespace: default
+  labels:
+    name: boxmodel
+    app: box-app
+spec:
+  clusterLabels:
+    matchLabels:
+      name: cobalt-ibm
+  clusterReplicas: 1
+  resourceHint:
+    order: desc
+    type: GPU
+  resourceSelector: {}
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementPolicy
+metadata:
+  name: boxmodel-local-cluster
+  namespace: default
+  labels:
+    name: boxmodel-local-cluster
+    app: box-app
+spec:
+  clusterLabels:
+    matchLabels:
+      name: local-cluster
+  clusterReplicas: 1
+  resourceHint:
+    order: desc
+    type: GPU
+  resourceSelector: {}
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementBinding
+metadata:
+  name: boxmodel-binding
+  namespace: default
+  labels:
+    name: boxmodel-binding
+    placementPolicy: boxmodel
+placementRef:
+  name: boxmodel
+  apiGroup: mcm.ibm.com
+  kind: PlacementPolicy
+subjects:
+  - name: boxmodel
+    apiGroup: mcm.ibm.com
+    kind: Deployable
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementBinding
+metadata:
+  name: boxmodel-local-cluster-binding
+  namespace: default
+  labels:
+    name: boxmodel-local-cluster-binding
+    placementPolicy: boxmodel
+placementRef:
+  name: boxmodel-local-cluster
+  apiGroup: mcm.ibm.com
+  kind: PlacementPolicy
+subjects:
+  - name: boxmodel
+    apiGroup: mcm.ibm.com
+    kind: Deployable
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: ApplicationRelationship
+metadata:
+  name: boxmodel-apprelation
+  namespace: default
+  labels:
+    app: box-app
+    destinationKind: Deployable
+    destinationName: boxmodel
+    sourceKind: Application
+    sourceName: box-app
+spec:
+  destination:
+    name: boxmodel
+    kind: Deployable
+  source:
+    name: box-app
+    kind: Application
+  type: contains
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: ApplicationRelationship
+metadata:
+  name: boxmodel-local-cluster-apprelation
+  namespace: default
+  labels:
+    app: box-app
+    destinationKind: Deployable
+    destinationName: boxmodel
+    sourceKind: Application
+    sourceName: box-app
+spec:
+  destination:
+    name: boxmodel
+    kind: Deployable
+  source:
+    name: box-app
+    kind: Application
+  type: contains
