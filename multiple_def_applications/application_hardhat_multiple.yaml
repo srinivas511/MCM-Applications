@@ -19,12 +19,12 @@ spec:
 apiVersion: mcm.ibm.com/v1alpha1
 kind: Deployable
 metadata:
-  name: inference
+  name: hardhat-deployment
   namespace: default
   labels:
-    name: inference
+    name: hardhat-deployment
     app: hardhat-app
-    placementPolicy: inference
+    placementPolicy: hardhat-deployment
     serviceKind: ApplicationService
 spec:
   deployer:
@@ -39,10 +39,10 @@ spec:
 apiVersion: mcm.ibm.com/v1alpha1
 kind: PlacementPolicy
 metadata:
-  name: inference
+  name: hardhat-deployment
   namespace: default
   labels:
-    name: inference
+    name: hardhat-deployment
     app: hardhat-app
 spec:
   clusterLabels:
@@ -57,15 +57,15 @@ spec:
 apiVersion: mcm.ibm.com/v1alpha1
 kind: PlacementPolicy
 metadata:
-  name: inference-local
+  name: hardhat-deployment-att
   namespace: default
   labels:
-    name: inference-local
+    name: hardhat-deployment-att
     app: hardhat-app
 spec:
   clusterLabels:
     matchLabels:
-      name: local-cluster
+      name: cobalt-att
   clusterReplicas: 1
   resourceHint:
     order: desc
@@ -75,51 +75,51 @@ spec:
 apiVersion: mcm.ibm.com/v1alpha1
 kind: PlacementBinding
 metadata:
-  name: inference-binding
+  name: hardhat-deployment-binding
   namespace: default
   labels:
-    name: inference-binding
-    placementPolicy: inference
+    name: hardhat-deployment-binding
+    placementPolicy: hardhat-deployment
 placementRef:
-  name: inference
+  name: hardhat-deployment
   apiGroup: mcm.ibm.com
   kind: PlacementPolicy
 subjects:
-  - name: inference
+  - name: hardhat-deployment
     apiGroup: mcm.ibm.com
     kind: Deployable
 ---
 apiVersion: mcm.ibm.com/v1alpha1
 kind: PlacementBinding
 metadata:
-  name: inference-local-binding
+  name: hardhat-deployment-att-binding
   namespace: default
   labels:
-    name: inference-local-binding
-    placementPolicy: inference-local
+    name: hardhat-deployment-att-binding
+    placementPolicy: hardhat-deployment-att
 placementRef:
-  name: inference-local
+  name: hardhat-deployment-att
   apiGroup: mcm.ibm.com
   kind: PlacementPolicy
 subjects:
-  - name: inference
+  - name: hardhat-deployment
     apiGroup: mcm.ibm.com
     kind: Deployable
 ---
 apiVersion: mcm.ibm.com/v1alpha1
 kind: ApplicationRelationship
 metadata:
-  name: inference-apprelation
+  name: hardhat-deployment-apprelation
   namespace: default
   labels:
     app: hardhat-app
     destinationKind: Deployable
-    destinationName: inference
+    destinationName: hardhat-deployment
     sourceKind: Application
     sourceName: hardhat-app
 spec:
   destination:
-    name: inference
+    name: hardhat-deployment
     kind: Deployable
   source:
     name: hardhat-app
@@ -129,17 +129,17 @@ spec:
 apiVersion: mcm.ibm.com/v1alpha1
 kind: ApplicationRelationship
 metadata:
-  name: inference-local-apprelation
+  name: hardhat-deployment-att-apprelation
   namespace: default
   labels:
     app: hardhat-app
     destinationKind: Deployable
-    destinationName: inference
+    destinationName: hardhat-deployment
     sourceKind: Application
     sourceName: hardhat-app
 spec:
   destination:
-    name: inference
+    name: hardhat-deployment
     kind: Deployable
   source:
     name: hardhat-app

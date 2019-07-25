@@ -1,0 +1,91 @@
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: hardhat-app
+  namespace: default
+  labels:
+    name: hardhat-app
+    app: hardhat-app
+spec:
+  componentKinds:
+    - group: apps
+      kind: Deployment
+  descriptor: {}
+  selector:
+    matchLabels:
+      app: hardhat-app
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: Deployable
+metadata:
+  name: hardhat-deployment
+  namespace: default
+  labels:
+    name: hardhat-deployment
+    app: hardhat-app
+    placementPolicy: hardhat-deployment
+    serviceKind: ApplicationService
+spec:
+  deployer:
+    helm:
+      namespace: default
+      chartName: inference
+      chartURL: >-
+        https://raw.githubusercontent.com/srinivas511/inference-server-repo/master/inference-0.0.8.tgz
+      repository: inference-github-repo
+    kind: helm
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementPolicy
+metadata:
+  name: hardhat-deployment
+  namespace: default
+  labels:
+    name: hardhat-deployment
+    app: hardhat-app
+spec:
+  clusterLabels:
+    matchLabels:
+      datacenter: us-east
+  clusterReplicas: 2
+  resourceHint:
+    order: desc
+    type: GPU
+  resourceSelector: {}
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementBinding
+metadata:
+  name: hardhat-deployment-binding
+  namespace: default
+  labels:
+    name: hardhat-deployment-binding
+    placementPolicy: hardhat-deployment
+placementRef:
+  name: hardhat-deployment
+  apiGroup: mcm.ibm.com
+  kind: PlacementPolicy
+subjects:
+  - name: hardhat-deployment
+    apiGroup: mcm.ibm.com
+    kind: Deployable
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: ApplicationRelationship
+metadata:
+  name: hardhat-deployment-apprelation
+  namespace: default
+  labels:
+    app: hardhat-app
+    destinationKind: Deployable
+    destinationName: hardhat-deployment
+    sourceKind: Application
+    sourceName: hardhat-app
+spec:
+  destination:
+    name: hardhat-deployment
+    kind: Deployable
+  source:
+    name: hardhat-app
+    kind: Application
+  type: contains

@@ -47,12 +47,64 @@ metadata:
 spec:
   clusterLabels:
     matchLabels:
-      datacenter: us-east
-  clusterReplicas: 2
+      name: cobalt-ibm
+  clusterReplicas: 1
   resourceHint:
     order: desc
     type: GPU
   resourceSelector: {}
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementPolicy
+metadata:
+  name: boxmodel-att
+  namespace: default
+  labels:
+    name: boxmodel-att
+    app: box-app
+spec:
+  clusterLabels:
+    matchLabels:
+      name: cobalt-att
+  clusterReplicas: 1
+  resourceHint:
+    order: desc
+    type: GPU
+  resourceSelector: {}
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementBinding
+metadata:
+  name: boxmodel-binding
+  namespace: default
+  labels:
+    name: boxmodel-binding
+    placementPolicy: boxmodel
+placementRef:
+  name: boxmodel
+  apiGroup: mcm.ibm.com
+  kind: PlacementPolicy
+subjects:
+  - name: boxmodel
+    apiGroup: mcm.ibm.com
+    kind: Deployable
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementBinding
+metadata:
+  name: boxmodel-att-binding
+  namespace: default
+  labels:
+    name: boxmodel-att-binding
+    placementPolicy: boxmodel
+placementRef:
+  name: boxmodel-att
+  apiGroup: mcm.ibm.com
+  kind: PlacementPolicy
+subjects:
+  - name: boxmodel
+    apiGroup: mcm.ibm.com
+    kind: Deployable
 ---
 apiVersion: mcm.ibm.com/v1alpha1
 kind: ApplicationRelationship
@@ -75,18 +127,21 @@ spec:
   type: contains
 ---
 apiVersion: mcm.ibm.com/v1alpha1
-kind: PlacementBinding
+kind: ApplicationRelationship
 metadata:
-  name: boxmodel-binding
+  name: boxmodel-att-apprelation
   namespace: default
   labels:
-    name: boxmodel-binding
-    placementPolicy: boxmodel
-placementRef:
-  name: boxmodel
-  apiGroup: mcm.ibm.com
-  kind: PlacementPolicy
-subjects:
-  - name: boxmodel
-    apiGroup: mcm.ibm.com
+    app: box-app
+    destinationKind: Deployable
+    destinationName: boxmodel
+    sourceKind: Application
+    sourceName: box-app
+spec:
+  destination:
+    name: boxmodel
     kind: Deployable
+  source:
+    name: box-app
+    kind: Application
+  type: contains

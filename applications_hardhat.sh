@@ -13,6 +13,6 @@ HUB_CLUSTER_NAMESPACE=${3:-mycluster}
 echo "----- LOGIN TO HUB ------"
 cloudctl login -a $HUB_URL -u $HUB_CONSOLE_USERNAME -p $HUB_CONSOLE_PASSWORD -n default
 
-kubectl apply -f application_hardhat.yaml
+kubectl apply -f application_hardhat_clusters.yaml
 
 cloudctl logout
