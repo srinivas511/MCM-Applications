@@ -31,7 +31,7 @@ spec:
       namespace: default
       chartName: inference
       chartURL: >-
-        https://raw.githubusercontent.com/srinivas511/inference-server-repo/master/inference-0.0.8.tgz
+        https://raw.githubusercontent.com/srinivas511/inference-server-repo/master/inference-0.0.9.tgz
       repository: inference-github-repo
     kind: helm
 ---
