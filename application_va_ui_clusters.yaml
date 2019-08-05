@@ -29,9 +29,9 @@ spec:
   deployer:
     helm:
       namespace: default
-      chartName: va-ui
+      chartName: iva-ui
       chartURL: >-
-        https://raw.githubusercontent.com/srinivas511/inference-server-repo/master/va-ui-0.0.1.tgz
+        https://raw.githubusercontent.com/srinivas511/inference-server-repo/master/iva-ui-0.1.0.tgz
       repository: inference-github-repo
     kind: helm
 ---
