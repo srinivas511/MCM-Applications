@@ -1,11 +1,11 @@
 apiVersion: app.k8s.io/v1beta1
 kind: Application
 metadata:
-  name: va-ui
+  name: va-ui-app
   namespace: default
   labels:
-    name: va-ui
-    app: va-ui
+    name: va-ui-app
+    app: va-ui-app
 spec:
   componentKinds:
     - group: apps
@@ -13,7 +13,7 @@ spec:
   descriptor: {}
   selector:
     matchLabels:
-      app: va-ui
+      app: va-ui-app
 ---
 apiVersion: mcm.ibm.com/v1alpha1
 kind: Deployable
@@ -22,7 +22,7 @@ metadata:
   namespace: default
   labels:
     name: va-ui-deployment
-    app: va-ui
+    app: va-ui-app
     placementPolicy: va-ui-deployment
     serviceKind: ApplicationService
 spec:
@@ -42,15 +42,13 @@ metadata:
   namespace: default
   labels:
     name: va-ui-deployment
-    app: va-ui
+    app: va-ui-app
 spec:
   clusterLabels:
     matchLabels:
       datacenter: us-east
   clusterReplicas: 2
-  resourceHint:
-    order: desc
-    type: GPU
+  resourceHint: {}
   resourceSelector: {}
 ---
 apiVersion: mcm.ibm.com/v1alpha1
@@ -76,16 +74,16 @@ metadata:
   name: va-ui-deployment-apprelation
   namespace: default
   labels:
-    app: va-ui
+    app: va-ui-app
     destinationKind: Deployable
-    destinationName: hardhat-deployment
+    destinationName: va-ui-deployment
     sourceKind: Application
-    sourceName: va-ui
+    sourceName: va-ui-app
 spec:
   destination:
     name: va-ui-deployment
     kind: Deployable
   source:
-    name: va-ui
+    name: va-ui-app
     kind: Application
   type: contains
